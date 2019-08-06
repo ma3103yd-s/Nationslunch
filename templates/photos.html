@@ -1,0 +1,17 @@
+</<!DOCTYPE html>
+<html>
+  <head>
+    <title> Nationslunch meny </title>
+  </head>
+
+  <body>
+  <h2> Luncher </h2>
+  {% if variable %}
+      {% for href in variable %}
+        <p><a href="{{href}}">Lunch</a></p>
+      {% endfor %}
+  {% endif %}
+  </body>
+
+
+</html>
