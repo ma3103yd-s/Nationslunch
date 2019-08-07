@@ -15,7 +15,7 @@ import re
 
 class NationsSpider(scrapy.Spider):
     name = "Nationsspider"
-    SCROLL_PAUSE_TIME = 0.5;
+    SCROLL_PAUSE_TIME = 0.5
     start_urls = [
     "https://www.facebook.com/pg/goteborgs/posts/?ref=page_internal",
     "https://www.facebook.com/pg/helsingkrona/posts/?ref=page_internal",
