@@ -15,7 +15,7 @@ import re
 
 class NationsSpider(scrapy.Spider):
     name = "Nationsspider"
-    SCROLL_PAUSE_TIME = 0.5
+    SCROLL_PAUSE_TIME = 0.5;
     start_urls = [
     "https://www.facebook.com/pg/goteborgs/posts/?ref=page_internal",
     "https://www.facebook.com/pg/helsingkrona/posts/?ref=page_internal",
@@ -27,6 +27,17 @@ class NationsSpider(scrapy.Spider):
     "https://www.facebook.com/pg/sydskanska/posts/?ref=page_internal",
     "https://www.facebook.com/pg/Ostgota/posts/?ref=page_internal",
     ]
+    correct_images = {
+        "https://www.facebook.com/goteborgs/posts/?ref=page_internal":['281','500'],
+        "https://www.facebook.com/helsingkrona/posts/?ref=page_internal":['281', '500'],
+        "https://www.facebook.com/hallandsnation/posts/?ref=page_internal":['354','500'],
+        "https://www.facebook.com/lundsnation/posts/?ref=page_internal":['352', '500'],
+        "https://www.facebook.com/kristianstadsnation/posts/?ref=page_internal":['500','280'],
+        "https://www.facebook.com/malmonation/posts/?ref=page_internal":['500','625'],
+        "https://www.facebook.com/kalmarnationlund/posts/?ref=page_internal":['500','500'],
+        "https://www.facebook.com/sydskanska/posts/?ref=page_internal":['308','500'],
+        "https://www.facebook.com/Ostgota/posts/?ref=page_internal":['500','500'],
+    }
 
     def __init__(self):
         self.browser = webdriver.Chrome()
@@ -48,6 +59,7 @@ class NationsSpider(scrapy.Spider):
     def parse(self, response):
         found_photo = False
         self.browser.get(response.url)
+        print("---------URL---------", response.url)
         last_height = self.browser.execute_script(
             "return document.body.scrollHeight")
         item = nlitem()
@@ -65,14 +77,22 @@ class NationsSpider(scrapy.Spider):
                     if not image_el == None:
                         image_class = image_el.find_element_by_class_name("uiScaledImageContainer")
                         image = image_class.find_element_by_css_selector('img')
-                        image_url = image.get_attribute('src')
-                        item['file_urls'] = [image_url]
-                        found_photo = True
-                        break
+                        dimensions=[
+                                    image.get_attribute('width'),
+                                    image.get_attribute('height'),
+                                    ]
+                        print(dimensions)
+                        if NationsSpider.correct_images[response.url] == dimensions:
+                            image_url = image.get_attribute('src')
+                            item['file_urls'] = [image_url]
+                            found_photo = True
+                            break
+
 
 
             self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(NationsSpider.SCROLL_PAUSE_TIME)
+            #self.browser.implicitly_wait(NationsSpider.SCROLL_PAUSE_TIME)
             new_height = self.browser.execute_script("return document.body.scrollHeight")
             if new_height == last_height:
                 break
