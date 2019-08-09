@@ -1,21 +1,22 @@
 from flask import Flask
 from flask import render_template
-import json
+from database import MyClient
+from database import Spreadsheet
 
-app =  Flask(__name__, template_folder="c:/users/markus/desktop/projects/nationslunch/templates")
+
+
+def get_values():
+    file = "/home/nationsluncharna/nationslunch/Nationslunch/nationslunch/client_secret.json"
+    client = MyClient(file)
+    sheet = Spreadsheet(client, 'Nationslunch', 0)
+    urls = sheet.sheets[0].col_values(1)
+    return urls
+
+
+app =  Flask(__name__, template_folder="/home/nationsluncharna/nationslunch/Nationslunch/templates")
+
 
 @app.route('/')
-
 def show_images():
-    file_name="c:/Users/Markus/desktop/projects/nationslunch/spider/nationslunchspider/output/images.jl"
-    with open(file_name, 'r') as file:
-        json_text=file.readlines()
-
-    url_items = []
-    for line in json_text:
-        url_items.append(json.loads(line)['file_urls'][0])
-        print(type(url_items[0]))
+    url_items = get_values()
     return render_template("photos.html", variable=url_items)
-
-if __name__ == '__main__':
-    app.run()
