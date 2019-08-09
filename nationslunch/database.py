@@ -48,14 +48,13 @@ class Spreadsheet(object):
     def __init__(self, client, name,sheet_nbr):
         self.sheet = client.open(name)
         self.sheets = []
-        self.sheets.append(self.sheet.get_worksheet(nbr))
+        self.sheets.append(self.sheet.get_worksheet(sheet_nbr))
 
 
     def update_sheet(self,sheet_nbr, values):
-        sheet_to_update = self.sheets[sheet_nbr]
-        index = 0
+        index = 1
         for value in values:
-            sheet_to_update.update_cell(index,1,value)
+            self.sheets[sheet_nbr].update_cell(index,1,value)
             index +=1
 
 
@@ -64,12 +63,12 @@ class Spreadsheet(object):
         values = sheet.col_values(1).remove('URL')
         return values
 
-    def update_sheet(self):
+    def add_sheet(self):
         self.sheets.append(self.sheet.get_worksheet(len(self.sheets)))
 
 
 
 if __name__ == '__main__':
     sheet_client = MyClient('client_secret.json')
-    sheet = Spreadsheet(sheet_client,'Nationslunch',1)
-    sheet.update_sheet(1, [1,2,3,4,5])
+    sheet = Spreadsheet(sheet_client,'Nationslunch',0)
+    sheet.update_sheet(0, [1,2,3,4,5])
