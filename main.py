@@ -27,4 +27,10 @@ def job():
     sheet.update_sheet(0, url_items)
 
 
-job()
+schedule.every().sunday.at("21:00").do(job)
+schedule.every().monday.at("11:00").do(job)
+
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)
