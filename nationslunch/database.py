@@ -65,10 +65,3 @@ class Spreadsheet(object):
 
     def add_sheet(self):
         self.sheets.append(self.sheet.get_worksheet(len(self.sheets)))
-
-
-
-if __name__ == '__main__':
-    sheet_client = MyClient('client_secret.json')
-    sheet = Spreadsheet(sheet_client,'Nationslunch',0)
-    sheet.update_sheet(0, [1,2,3,4,5])
