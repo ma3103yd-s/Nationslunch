@@ -1,17 +1,29 @@
-from nationslunchspider.items import NationslunchspiderItem as nlitem
-from selenium import webdriver
-from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
-from scrapy.selector import HtmlXPathSelector
-from scrapy.http import Response
-from scrapy.http import TextResponse
 import scrapy
 import time
 import re
+import datetime
+from datetime import timedelta
+from items import NationslunchspiderItem as nlitem
+from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
+from scrapy.http import Response
+from scrapy.http import TextResponse
+from scrapy.crawler import CrawlerProcess
+from scrapy.utils.project import get_project_settings
 
+date = datetime.datetime.now()
+time_diff = timedelta(days=1)
+month = date.strftime("%A")
+#day = int(unformatted_date.strftime("%d"))
+max_date = date + time_diff
+min_date = date-time_diff
+days = [min_date.day, date.day,max_date.day]
+months = [min_date.strftime("%B"), date.strftime("%B"), max_date.strftime("%B")]
+if months[0]==months[1]:
+    del months[0]
 
+#correct_date = "{}{}[{}{}{}]. ".format(months[0],months[1], days[0], days[1], days[2])
+correct_date = "{} [{}{}{}{}{}].".format("June",2,3,4,5,6)
 
 class NationsSpider(scrapy.Spider):
     name = "Nationsspider"
@@ -56,45 +68,54 @@ class NationsSpider(scrapy.Spider):
 
 
 
+    def inner(self, url, item):
+        el = self.browser.find_elements_by_class_name("_4-u2._4-u8")
+
+
+        for e in el:
+
+            caption = str(e.text)
+            if re.search("[Vv]ecka.", caption) or re.search("[Mm]eny.", caption):
+
+                image_el = self.find_image(e)
+                if not image_el == None:
+                    image_class = image_el.find_element_by_class_name("uiScaledImageContainer")
+                    image = image_class.find_element_by_css_selector('img')
+                    dimensions=[
+                                image.get_attribute('width'),
+                                image.get_attribute('height'),
+                                ]
+                    #print(dimensions)
+                    if NationsSpider.correct_images[url] == dimensions:
+                        print(correct_date)
+                        print(caption)
+                        if re.search(correct_date, caption):
+                            image_url = image.get_attribute('src')
+                            item['file_urls'] = [image_url]
+                            return 0
+                        self.browser.refresh()
+                        return 1
+
+
     def parse(self, response):
         found_photo = False
         self.browser.get(response.url)
-        print("---------URL---------", response.url)
+        print(correct_date)
         last_height = self.browser.execute_script(
             "return document.body.scrollHeight")
         item = nlitem()
         while(not found_photo):
-            el = self.browser.find_elements_by_class_name("_4-u2._4-u8")
 
-            #el = self.browser.find_elements_by_class_name("_5pbx.userContent._3576")
-            for e in el:
-                # Fix the find_element_by_class_name by selecting from el
-                #text_el = e.find_elements_by_class_name("_5pbx.userContent._3576")
-                caption = str(e.text)
-
-                if re.search("[Vv]ecka.", caption) or re.search("[Mm]eny.", caption):
-                    image_el = self.find_image(e)
-                    if not image_el == None:
-                        image_class = image_el.find_element_by_class_name("uiScaledImageContainer")
-                        image = image_class.find_element_by_css_selector('img')
-                        dimensions=[
-                                    image.get_attribute('width'),
-                                    image.get_attribute('height'),
-                                    ]
-                        print(dimensions)
-                        if NationsSpider.correct_images[response.url] == dimensions:
-                            image_url = image.get_attribute('src')
-                            item['file_urls'] = [image_url]
-                            found_photo = True
-                            break
-
-
-
+            if not self.inner(response.url, item): found_photo = True
             self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(NationsSpider.SCROLL_PAUSE_TIME)
             #self.browser.implicitly_wait(NationsSpider.SCROLL_PAUSE_TIME)
             new_height = self.browser.execute_script("return document.body.scrollHeight")
-            if new_height == last_height:
-                break
             last_height = new_height
         yield item
+
+# import this to run spider
+def run_spider():
+    process = CrawlerProcess(get_project_settings())
+    process.crawl(NationsSpider)
+    process.start()
