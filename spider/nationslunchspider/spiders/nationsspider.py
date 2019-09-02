@@ -3,6 +3,8 @@ import time
 import re
 import datetime
 from datetime import timedelta
+import sys
+sys.path.append('../')
 from items import NationslunchspiderItem as nlitem
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
@@ -11,47 +13,41 @@ from scrapy.http import TextResponse
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 
-date = datetime.datetime.now()
-time_diff = timedelta(days=1)
-month = date.strftime("%A")
-#day = int(unformatted_date.strftime("%d"))
-max_date = date + time_diff
-min_date = date-time_diff
-days = [min_date.day, date.day,max_date.day]
-months = [min_date.strftime("%B"), date.strftime("%B"), max_date.strftime("%B")]
-if months[0]==months[1]:
-    del months[0]
-
-#correct_date = "{}{}[{}{}{}]. ".format(months[0],months[1], days[0], days[1], days[2])
-correct_date = "{} [{}{}{}{}{}].".format("June",2,3,4,5,6)
 
 class NationsSpider(scrapy.Spider):
     name = "Nationsspider"
+    nationer = {
+            "https://www.facebook.com/goteborgs/posts/?ref=page_internal":"Göteborg",
+            "https://www.facebook.com/helsingkrona/posts/?ref=page_internal":"Helsingkrona",
+            "https://www.facebook.com/hallandsnation/posts/?ref=page_internal":"Hallands",
+            "https://www.facebook.com/lundsnation/posts/?ref=page_internal":"Lunds",
+            "https://www.facebook.com/kristianstadsnation/posts/?ref=page_internal":"Kristianstads",
+            "https://www.facebook.com/malmonation/posts/?ref=page_internal":"Malmo",
+            "https://www.facebook.com/kalmarnationlund/posts/?ref=page_internal":"Kalmar",
+            "https://www.facebook.com/sydskanska/posts/?ref=page_internal":"Sydskånska",
+            "https://www.facebook.com/Ostgota/posts/?ref=page_internal":"Östgöta",
+            }
+
+
+
     SCROLL_PAUSE_TIME = 0.5
-    start_urls = [
-    "https://www.facebook.com/pg/goteborgs/posts/?ref=page_internal",
-    "https://www.facebook.com/pg/helsingkrona/posts/?ref=page_internal",
-    "https://www.facebook.com/pg/hallandsnation/posts/?ref=page_internal",
-    "https://www.facebook.com/pg/lundsnation/posts/?ref=page_internal",
-    "https://www.facebook.com/pg/kristianstadsnation/posts/?ref=page_internal",
-    "https://www.facebook.com/pg/malmonation/posts/?ref=page_internal",
-    "https://www.facebook.com/pg/kalmarnationlund/posts/?ref=page_internal",
-    "https://www.facebook.com/pg/sydskanska/posts/?ref=page_internal",
-    "https://www.facebook.com/pg/Ostgota/posts/?ref=page_internal",
-    ]
+    start_urls = list(nationer.keys())
+   
     correct_images = {
         "https://www.facebook.com/goteborgs/posts/?ref=page_internal":['281','500'],
         "https://www.facebook.com/helsingkrona/posts/?ref=page_internal":['281', '500'],
         "https://www.facebook.com/hallandsnation/posts/?ref=page_internal":['354','500'],
         "https://www.facebook.com/lundsnation/posts/?ref=page_internal":['352', '500'],
-        "https://www.facebook.com/kristianstadsnation/posts/?ref=page_internal":['500','280'],
+        "https://www.facebook.com/kristianstadsnation/posts/?ref=page_internal":['501','281'],
         "https://www.facebook.com/malmonation/posts/?ref=page_internal":['500','625'],
-        "https://www.facebook.com/kalmarnationlund/posts/?ref=page_internal":['500','500'],
+        "https://www.facebook.com/kalmarnationlund/posts/?ref=page_internal":['500','387'],
         "https://www.facebook.com/sydskanska/posts/?ref=page_internal":['308','500'],
         "https://www.facebook.com/Ostgota/posts/?ref=page_internal":['500','500'],
     }
 
     def __init__(self):
+        #options = webdriver.ChromeOptions()
+        #options.add_argument('headless')
         self.browser = webdriver.Chrome()
         self.browser.maximize_window()
 
@@ -75,43 +71,41 @@ class NationsSpider(scrapy.Spider):
         for e in el:
 
             caption = str(e.text)
-            if re.search("[Vv]ecka.", caption) or re.search("[Mm]eny.", caption):
+            image_el = self.find_image(e)
+            if not image_el == None:
+                image_class = image_el.find_element_by_class_name("uiScaledImageContainer")
+                image = image_class.find_element_by_css_selector('img')
+                dimensions=[
+                            image.get_attribute('width'),
+                            image.get_attribute('height'),
+                            ]
+                print(dimensions)
+                if NationsSpider.correct_images[url] == dimensions:
+                    print(caption)
+                        #print(correct_images[url])
+                    image_url = image.get_attribute('src')
+                    item['file_urls'] = [image_url]
+                    
+                    return True
 
-                image_el = self.find_image(e)
-                if not image_el == None:
-                    image_class = image_el.find_element_by_class_name("uiScaledImageContainer")
-                    image = image_class.find_element_by_css_selector('img')
-                    dimensions=[
-                                image.get_attribute('width'),
-                                image.get_attribute('height'),
-                                ]
-                    #print(dimensions)
-                    if NationsSpider.correct_images[url] == dimensions:
-                        print(correct_date)
-                        print(caption)
-                        if re.search(correct_date, caption):
-                            image_url = image.get_attribute('src')
-                            item['file_urls'] = [image_url]
-                            return 0
-                        self.browser.refresh()
-                        return 1
 
 
     def parse(self, response):
         found_photo = False
         self.browser.get(response.url)
-        print(correct_date)
+
         last_height = self.browser.execute_script(
             "return document.body.scrollHeight")
         item = nlitem()
         while(not found_photo):
 
-            if not self.inner(response.url, item): found_photo = True
+            found_photo = self.inner(response.url, item)
             self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(NationsSpider.SCROLL_PAUSE_TIME)
             #self.browser.implicitly_wait(NationsSpider.SCROLL_PAUSE_TIME)
             new_height = self.browser.execute_script("return document.body.scrollHeight")
             last_height = new_height
+        item['name'] = [NationsSpider.nationer[response.url]]
         yield item
 
 # import this to run spider

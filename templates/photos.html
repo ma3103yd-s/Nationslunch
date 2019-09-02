@@ -6,9 +6,9 @@
 
   <body>
   <h2> Luncher </h2>
-  {% if variable %}
-      {% for href in variable %}
-        <p><a href="{{href}}">Lunch</a></p>
+  {% if names and urls %}
+      {% for name in names %}
+      <p><a href="{{urls[loop.index0]}}">{{name}}</a></p>
       {% endfor %}
   {% endif %}
   </body>

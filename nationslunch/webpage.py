@@ -3,13 +3,14 @@ from flask import render_template
 from database import MyClient
 from database import Spreadsheet
 
+file = "/home/nationsluncharna/nationslunch/Nationslunch/nationslunch/client_secret.json"
+client = MyClient(file)
+sheet = Spreadsheet(client, 'Nationslunch', 0)
 
 
 def get_values():
-    file = "/home/nationsluncharna/nationslunch/Nationslunch/nationslunch/client_secret.json"
-    client = MyClient(file)
-    sheet = Spreadsheet(client, 'Nationslunch', 0)
-    urls = sheet.sheets[0].col_values(1)
+    names = sheet.sheets[0].col_values(1)
+    urls = sheet.sheets[0].col_values(2)
     return urls
 
 

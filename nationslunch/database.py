@@ -51,10 +51,10 @@ class Spreadsheet(object):
         self.sheets.append(self.sheet.get_worksheet(sheet_nbr))
 
 
-    def update_sheet(self,sheet_nbr, values):
+    def update_sheet(self, sheet_nbr, col, values):
         index = 1
         for value in values:
-            self.sheets[sheet_nbr].update_cell(index,1,value)
+            self.sheets[sheet_nbr].update_cell(index,col,value)
             index +=1
 
 

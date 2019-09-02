@@ -11,7 +11,7 @@ import scrapy
 class NationslunchspiderItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    #name = scrapy.Field()
+    name = scrapy.Field()
     #date = scrapy.Field()
     file_urls = scrapy.Field()
     #files = scrapy.Field()

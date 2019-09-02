@@ -17,20 +17,27 @@ sheet = Spreadsheet(client, 'Nationslunch', 0)
 def job():
     run_spider()
 
-    url_items=[]
+    url_items={}
     with open(FILE_PATH) as file:
         json_text = file.readlines()
 
     for line in json_text:
-        url_items.append(json.loads(line)['file_urls'][0])
-
-    sheet.update_sheet(0, url_items)
-
-
-schedule.every().sunday.at("21:00").do(job)
-schedule.every().monday.at("11:00").do(job)
+        name = json.loads(line)['name'][0]
+        url = json.loads(line)['file_urls'][0]
+        url_items[name]=url
+    sheet.update_sheet(0,1,list(url_items.keys()))
+    sheet.update_sheet(0,2,list(url_items.values())) 
 
 
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+#schedule.every().sunday.at("21:00").do(job)
+#schedule.every().monday.at("11:00").do(job)
+
+
+
+#while True:
+ #   schedule.run_pending()
+  #  time.sleep(1)
+if __name__=='__main__':
+    job()
+
+    
