@@ -1,18 +1,13 @@
 import scrapy
 import time
 import re
-import datetime
-from datetime import timedelta
 import sys
 sys.path.append('../')
 from items import NationslunchspiderItem as nlitem
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from scrapy.http import Response
-from scrapy.http import TextResponse
-from scrapy.crawler import CrawlerProcess
-from scrapy.utils.project import get_project_settings
-
+import subprocess
 
 class NationsSpider(scrapy.Spider):
     name = "Nationsspider"
@@ -41,7 +36,7 @@ class NationsSpider(scrapy.Spider):
         "https://www.facebook.com/kristianstadsnation/posts/?ref=page_internal":['501','281'],
         "https://www.facebook.com/malmonation/posts/?ref=page_internal":['500','625'],
         "https://www.facebook.com/kalmarnationlund/posts/?ref=page_internal":['500','387'],
-        "https://www.facebook.com/sydskanska/posts/?ref=page_internal":['308','500'],
+        "https://www.facebook.com/sydskanska/posts/?ref=page_internal":['344','500'],
         "https://www.facebook.com/Ostgota/posts/?ref=page_internal":['500','500'],
     }
 
@@ -108,8 +103,4 @@ class NationsSpider(scrapy.Spider):
         item['name'] = [NationsSpider.nationer[response.url]]
         yield item
 
-# import this to run spider
-def run_spider():
-    process = CrawlerProcess(get_project_settings())
-    process.crawl(NationsSpider)
-    process.start()
+

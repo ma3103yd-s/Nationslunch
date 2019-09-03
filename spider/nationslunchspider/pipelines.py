@@ -12,6 +12,8 @@ class CustomPipeline(object):
 
     def open_spider(self, spider):
         self.file = open('c:/Users/Markus/desktop/projects/nationslunch/spider/nationslunchspider/output/images.jl', 'w')
+        self.file.truncate()
+    
 
     def close_spider(self,spider):
         self.file.close()
