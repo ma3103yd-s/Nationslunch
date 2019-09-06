@@ -9,6 +9,10 @@
   {% if names and urls %}
       {% for name in names %}
       <p><a href="{{urls[loop.index0]}}">{{name}}</a></p>
+      {% if nbr and name == 'Göteborg' %}
+      <p><a href = "{{nbr}}"></a></p>
+      {% endif %}
+	
       {% endfor %}
   {% endif %}
   </body>

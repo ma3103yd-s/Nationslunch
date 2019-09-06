@@ -9,10 +9,16 @@ sheet = Spreadsheet(client, 'Nationslunch', 0)
 
 names = sheet.sheets[0].col_values(1)
 urls = sheet.sheets[0].col_values(2)
+nbr = sheet.sheets[0].col_values(3)
 file = "urls.csv"
 with open(file,'w') as f:
     f.truncate()
     for i in range(len(names)):
-        f.write(f"{names[i]}, {urls[i]}\n")
+        f.write(f"{names[i]}, {urls[i]}")
+        try:
+            f.write(f", {nbr[i]}\n")
+        except:
+            f.write("\n")
+    
 
 

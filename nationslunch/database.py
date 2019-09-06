@@ -57,10 +57,16 @@ class Spreadsheet(object):
             self.sheets[sheet_nbr].update_cell(index,col,value)
             index +=1
 
+    def update_cell(self, sheet_nbr, row, col, value):
+        self.sheets[sheet_nbr].update_cell(row, col, value)
 
-    def get_values(self,sheet_nbr):
+    def get_row(self,sheet_nbr, name):
         sheet = self.sheets[sheet_nbr]
-        values = sheet.col_values(1).remove('URL')
+        values = sheet.col_values(1)
+        for val in values:
+            if str(val) == name:
+                return values.index(val)
+
         return values
 
     def add_sheet(self):
