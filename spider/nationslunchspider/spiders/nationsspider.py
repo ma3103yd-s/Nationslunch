@@ -5,9 +5,6 @@ import sys
 sys.path.append('../')
 from items import NationslunchspiderItem as nlitem
 from selenium import webdriver
-from selenium.common.exceptions import TimeoutException
-from scrapy.http import Response
-import subprocess
 
 class NationsSpider(scrapy.Spider):
     name = "Nationsspider"
@@ -36,7 +33,7 @@ class NationsSpider(scrapy.Spider):
         "https://www.facebook.com/kristianstadsnation/posts/?ref=page_internal":['501','281'],
         "https://www.facebook.com/malmonation/posts/?ref=page_internal":['500','625'],
         "https://www.facebook.com/kalmarnationlund/posts/?ref=page_internal":['500','387'],
-        "https://www.facebook.com/sydskanska/posts/?ref=page_internal":['344','500'],
+        "https://www.facebook.com/sydskanska/posts/?ref=page_internal":['345','500'],
         "https://www.facebook.com/Ostgota/posts/?ref=page_internal":['500','500'],
     }
 
