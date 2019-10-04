@@ -1,19 +1,54 @@
-</<!DOCTYPE html>
+</!DOCTYPE html>
 <html>
-  <head>
-    <title> Nationslunch meny </title>
+
+<head>
+      <style>
+          body {
+              background-color: #F0F8FF;
+          }
+          h1 {
+              margin-left: 400px;
+              color: navy;
+              font-size: 60px;
+
+          }
+          h2 {
+              margin-left: 50px;
+              color: #000080
+              font-size: 30px;
+          }
+
+          h3 {
+              margin-left: 20px;
+              font-size: 20px;
+          }
+
+          p {
+              margin-left: 20px;
+              font-size: 15px;
+          }
+
+
+      </style>
+
+    <title>  Nationsluncher </title>
   </head>
 
   <body>
-  <h2> Luncher </h2>
-  {% if names and urls %}
+  <h1> Nationsluncher </h1>
+  <h2> Menyer </h2>
+  {% if names and urls and dates %}
       {% for name in names %}
-      <p><a href="{{urls[loop.index0]}}">{{name}}</a></p>
-      {% if nbr and name == 'Göteborg' %}
-      <p><a href = "{{nbr}}"></a></p>
-      {% endif %}
-	
+        <h3><a href="{{urls[loop.index0]}}">{{name}}</a></h3>
+        <p> {{dates[loop.index0]}} </p>
+
+        {% if nbr and name == 'Göteborg' %}
+        <p><a href="{{nbr}}">{{nbr}}</a></p>
+        {% endif %}
+        <hr>
       {% endfor %}
+
+
   {% endif %}
   </body>
 

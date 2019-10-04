@@ -14,6 +14,7 @@ class NationslunchspiderItem(scrapy.Item):
     name = scrapy.Field()
     #date = scrapy.Field()
     file_urls = scrapy.Field()
+    date = scrapy.Field()
     #files = scrapy.Field()
 
 class GSpiderItem(scrapy.Item):

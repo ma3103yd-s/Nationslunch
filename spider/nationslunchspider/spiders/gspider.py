@@ -12,7 +12,7 @@ from selenium import webdriver
 class GSpider(scrapy.Spider):
     name = "gspider"
     
-    SCROLL_PAUSE_TIME = 0.5
+    REFRESH_TIME = 60
 
     start_urls = ["https://www.facebook.com/goteborgs/posts/?ref=page_internal"]
 
@@ -24,8 +24,6 @@ class GSpider(scrapy.Spider):
     def parse(self, response):
         self.browser.get(response.url)
         
-        last_height = self.browser.execute_script(
-                "return document.body.scrollHeight")
         item = phoneitem()
         found_nbr = False
         while not found_nbr:
@@ -37,10 +35,8 @@ class GSpider(scrapy.Spider):
                 if nbr_match and date_match:
                     item['phone_nbr'] = nbr_match.group(0)
                     found_nbr = True
-            self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(GSpider.SCROLL_PAUSE_TIME)
-            new_height = self.browser.execute_script("return document.body.scrollHeight")
-            last_height = new_height
+            driver.refresh()
+            time.sleep(GSpider.REFRESH_TIME)
             yield item
 
 

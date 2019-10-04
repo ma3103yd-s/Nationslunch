@@ -53,12 +53,29 @@ class Spreadsheet(object):
 
     def update_sheet(self, sheet_nbr, col, values):
         index = 1
+        cell_list = []
+        sheet = self.sheets[sheet_nbr]
         for value in values:
-            self.sheets[sheet_nbr].update_cell(index,col,value)
+            cell = sheet.cell(index,col)
+            cell.value = value
+            cell_list.append(cell)
             index +=1
+
+        sheet.update_cells(cell_list)
 
     def update_cell(self, sheet_nbr, row, col, value):
         self.sheets[sheet_nbr].update_cell(row, col, value)
+
+    def delete_col(self, sheet_nbr, col):
+        sheet = self.sheets[sheet_nbr]
+        rows = 9
+        cells = sheet.range(1, 3, rows, 3)
+        for cell in cells:
+            cell.value = ''
+        sheet.update_cells(cells)
+
+       
+
 
     def get_row(self,sheet_nbr, name):
         sheet = self.sheets[sheet_nbr]
