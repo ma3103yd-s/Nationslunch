@@ -35,7 +35,7 @@ class GSpider(scrapy.Spider):
                 if nbr_match and date_match:
                     item['phone_nbr'] = nbr_match.group(0)
                     found_nbr = True
-            driver.refresh()
+            self.browser.refresh()
             time.sleep(GSpider.REFRESH_TIME)
             yield item
 
